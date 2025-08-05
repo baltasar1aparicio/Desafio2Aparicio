@@ -20,19 +20,21 @@ class ProductManager {
 
     async initialize() {
         try {
-
             const fileContent = await fs.readFile(RUTA, 'utf-8');
-
 
             if (fileContent && fileContent.trim() !== "") {
                 this.products = JSON.parse(fileContent);
             } else {
-
                 this.products = [];
             }
         } catch (error) {
-            console.error("Error al leer el archivo JSON:", error);
-            throw error;
+            if (error.code === 'ENOENT') {
+                await fs.writeFile(RUTA, JSON.stringify([]));
+                this.products = [];
+            } else {
+                console.error("Error al leer el archivo JSON:", error);
+                throw error;
+            }
         }
     }
 
